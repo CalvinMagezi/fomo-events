@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+        <title>FOMO Events</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+        <script type="text/javascript" src="key.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWBLqR_cVI-s5SJgKjlyzWzAYDvG1YLXA"></script>
+<style>
+	body{
+		font-family: 'Playfair Display', serif;
+		background:black;
+	}
+
+	
+
+	.text-1{
+	text-align: center;
+	text-shadow: 5px 5px 5px #000;
+	color:white;
+	} 
+
+	#page1{
+			background: #200122 !important;  /* fallback for old browsers */
+			background: -webkit-linear-gradient(to right, #6f0000, #200122) !important;  /* Chrome 10-25, Safari 5.1-6 */
+			background: linear-gradient(to right, #6f0000, #200122) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	margin:15px 0px 15px 0px;
+	border-radius: 10px;	
+	border:2px solid black;
+	}
+
+	#footer{
+		position: absolute;
+		width:100%;
+		bottom:0;
+	}
+
+	#btnLocation{
+		display:none;
+	}
+
+	#map-canvas{
+		height:400px;
+		width:100%;
+	}
+
+	#blockRed{
+		background-color:red;
+		width:50px;
+		height:50px;
+	}
+
+	#imgArea{
+		width:100%;
+	}
+
+	#body{
+		background:black;
+	}
+
+	#lander-loader_logo{
+		width:150px;
+		height:120px;
+	}
+</style>
+
+<script type="text/javascript">
+	var xmlhttp;
+	var options;
+	
+
+	window.onload = function()
+	{
+		document.addEventListener('deviceready', init);
+		// init();
+		document.getElementById('btnSave').addEventListener('click', storeData);
+		document.getElementById('btnSaves').addEventListener('click', saveData);
+		document.getElementById('btnRetrieve').addEventListener('click', getData);
+
+		db = window.openDatabase("Members", "1.0", "List of Employees", 200000);
+
+		document.getElementById('btnTakePicture').addEventListener('click', takePic);
+		document.getElementById('btnRemove').addEventListener('click', function(){
+			document.getElementById('imgArea').src="";
+		});
+
+
+
+	}
+
+	
+
+	function init()
+	{		
+		document.getElementById('btnLocation').style.display = "block";
+		options = { maximumAge: 3000, timeout: 5000,
+			enableHighAccuracy: true};
+	}
+
+	function getLocation()
+	{
+		navigator.geolocation.getCurrentPosition(success, failure, options);
+	}
+
+	function success(position)
+	{
+		var latitude = position.coords.latitude;
+		var long = position.coords.longitude;
+
+		var out = "<strong>Latitude:</strong> " + latitude;
+		out += "<br/><strong>Longitude: </strong> " + long;
+		document.getElementById('result').innerHTML = out;
+
+		var mapOptions = {
+			center: {lat: latitude, lng: long},
+			zoom:15
+		};
+		var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+	}
+
+	function failure(message)
+	{
+		alert("Error:" + message.message);
+	}
+
+	function getAreaInfo(lat, long)
+	{
+		var url=
+		"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=";
+		url += lat + ",";
+		url += long;
+		url += "&radius=500&types=food&key=" + key;
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = processPlace;
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	}
+
+	function processPlace()
+	{
+		var out="";
+		if(xmlhttp.readyState==4){
+			var theJSON = xmlhttp.responseText;
+			
+			var result = JSON.parse(theJSON);
+			var resultArray = result.results;
+			console.log(resultArray);
+			for(var x=0; x < resultArray.length; x++)
+			{
+				out += "<h2>" + resultArray[x].name + "</h2>";
+				out += "<br/>";
+				out += resultArray[x].vicinity;
+			}
+			
+		}
+	}
+
+	function error(e)
+	{
+		alert(e.message);
+	}
+
+
+	function saveData(e)
+	{
+		db.transaction(saveRecord, onSuccess, onError);
+	}
+
+	function getData(e)
+	{
+		var event = localStorage.getItem('currentEvent');
+		document.getElementById('result').innerHTML = event;
+	}
+
+	function storeData(e)
+	{
+		var event = document.getElementById('event').value;
+		localStorage.setItem('currentEvent', event);
+		var date = new Date();
+		localStorage.setItem('TimeStamp', date);
+	}
+
+
+	function saveRecord(transaction)
+	{
+		var name = document.getElementById('name').value;
+		var email = document.getElementById('email').value;
+		transaction.executeSql('CREATE TABLE IF NOT EXISTS membersLIST (id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, Email TEXT NOT NULL)');
+
+		var sql = "INSERT INTO membersLIST (Name,Email) VALUES ('" + name +"', '" + email + "')";
+		console.log(sql);
+		transaction.executeSql(sql);	
+		transaction.executeSql("SELECT * FROM membersLIST", [], getSuccess, getError);	
+	}
+
+	function getSuccess(tx, result)
+	{
+		var rows = result.rows;
+
+		for(var x=0; x< rows.length; x++){
+			var name = result.rows[x].NAME;
+		    var email = result.rows[x].Email;
+		    var out = "<li>" + name + "<br/>" + email + "</li>";
+		    document.getElementById('members').innerHTML += out;
+
+		}
+		$('#members').listview("refresh");
+		
+	}
+
+	function getError(e)
+	{
+		console.log(e);
+	}
+
+	function onSuccess()
+	{
+		console.log("Record Saved");
+	}
+
+	function onError(error)
+	{
+		console.log(error)
+	}
+
+	function clearScreen()
+	{
+		document.getElementById('map-canvas').innerHTML = "";
+		document.getElementById('map-canvas').style.backgroundColor = "white";
+		document.getElementById('result').innerHTML = "";
+	}
+
+	function takePic(e)
+	{
+		navigator.camera.getPicture(succeed, fail,{ quality: 80,  destinationType: destinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+	}
+
+	function succeed(thePicture)
+	{
+		var image = document.getElementById('imgArea');
+		image.src = thePicture;
+	}
+
+	function fail(e)
+	{
+		alert("Image failed: " + e.message);
+	}
+
+</script>
+    </head>
+    <body id="body">
+    <!-- ===================== -->
+    <!-- Landing Page -->
+    <!-- ===================== -->
+    	<div data-role="page" id="page1">    		
+    		<div data-role="header" id="my-header">
+    			<h1>FOMO Events</h1>
+    		</div><!-- header -->
+    		<div data-role="main" class="ui-content">
+    			<h2 class="text-1">See What's Going On</h2>
+    			<h2 class="text-1">In Your Atmosphere</h2>
+    			
+
+    			
+
+
+
+                                
+
+
+
+
+    			<button onclick="location.href='index.html#page2'">Choose Region</button> 
+
+
+
+    		</div><!-- main -->	  
+    		   		  		
+    	</div><!-- page -->
+
+
+<!-- ============= -->
+<!-- PAGE 2 -->
+<!-- ============= -->
+
+    	<div data-role="page" id="page2">
+    		<div data-role="header">
+    			<h1>FOMO Events</h1>
+    		</div><!-- header -->
+    		<div data-role="main" class="ui-content">
+    			<button onclick="location.href='index.html#page1'">Page 1</button>
+    			<button onclick="location.href='index.html#page3'">Page 3</button>
+    			<h2>Database Storage</h2>
+
+    			<label for="name">Name</label>
+    			<input type="text" id="name"  />
+    			<label for="email">Email</label>
+    			<input type="text" id="email"  />
+    			<button id="btnSaves" type="submit">Save</button>
+    			<button id="showList">Show Members</button>
+
+    			<ul id="members" data-role="listview">
+    				
+    			</ul>
+    			
+    			
+
+    			
+
+
+    			<label for="myFlip">Flip Switch</label>
+    			<input type="checkbox" id="myFlip" data-role="flipswitch"/>
+
+    		</div><!-- main -->	 
+    		<div data-role="footer" id="footer">
+    			<h1>Test Footer</h1>
+    		</div>   		
+    	</div><!-- page -->
+
+
+<!-- ============= -->
+<!-- PAGE 3 -->
+<!-- ============= -->
+
+    	<div data-role="page" id="page3">
+    		<div data-role="header">
+    			<h1>Local Storage</h1>
+    		</div><!-- header -->
+    		<div data-role="main" class="ui-content">
+    			<button onclick="location.href='index.html#page1'">Page 1</button>
+    			<button onclick="location.href='index.html#page2'">Page 2 </button>
+    			<button onclick="location.href='index.html#page4'">Page 4 </button>
+    			<h2>Mobile App p3</h2>
+
+    			<label for="event">Event Name</label>
+    			<input type="text" id="event"/>
+    			<button id="btnSave">Search For Events</button>    			
+    			<button id="btnRetrieve">Retrieve Events</button>
+
+    			
+
+
+    		</div><!-- main -->	 
+    		<div data-role="footer" id="footer">
+    			<h1>Test Footer</h1>
+    		</div>   		
+    	</div><!-- page -->
+
+
+<!-- ============= -->
+<!-- PAGE 4 -->
+<!-- ============= -->
+
+
+    	<div data-role="page" id="page4">
+    		<div data-role="header">
+    			<h1>Google Map</h1>
+    		</div><!-- header -->
+    		<div data-role="main" class="ui-content">
+    			<button onclick="location.href='index.html#page1'">Page 1</button>
+    			<button onclick="location.href='index.html#page2'">Page 2 </button>
+    			<button onclick="location.href='index.html#page3'">Page 3 </button>    			
+    			<button onclick="location.href='index.html#page5'">Page 5 </button>    			
+    			
+    			
+    				<button id ="btnLocation" onclick="getLocation()" >Get Location</button>
+    				<button id="btnClear" onclick="clearScreen()">Clear</button>
+    				<div id="result"></div>
+    				<div id="map-canvas"></div>
+    			
+    			
+
+    			
+
+
+    		</div><!-- main -->	 
+    		<div data-role="footer" id="footer">
+    			<h1>Test Footer</h1>
+    		</div>   		
+    	</div><!-- page -->    
+
+<!-- ============= -->
+<!-- PAGE 5 -->
+<!-- ============= -->
+
+
+    	<div data-role="page" id="page5">
+    		<div data-role="header">
+    			<h1>Take Picture</h1>
+    		</div><!-- header -->
+    		<div data-role="main" class="ui-content">
+    			<button onclick="location.href='index.html#page1'">Page 1</button>
+    			<button onclick="location.href='index.html#page2'">Page 2 </button>
+    			<button onclick="location.href='index.html#page3'">Page 3 </button>    			
+    			<button onclick="location.href='index.html#page4'">Page 4 </button>    			
+    			<h2>Take a photo</h2>
+    			    			
+    			<button id="btnTakePicture">Upload Event Picture</button>
+    			<button id="btnRemove">Remove</button>    			 			
+    			<img id="imgArea"/>
+
+
+    		</div><!-- main -->	 
+    		<div data-role="footer" id="footer">
+    			<h1>Test Footer</h1>
+    		</div>   		
+    	</div><!-- page -->    
+   		
+
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    </body>
+</html>

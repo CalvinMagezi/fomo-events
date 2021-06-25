@@ -1,0 +1,64 @@
+/*
+   statusbar-overlay sets the background color for the overlay. Black text is the default when the statusbar plugin is not added. When the
+   statusbar plugin is added, it also adds default setting to make the content white via:
+
+       <preference name="StatusBarStyle" value="lightcontent"/>
+
+   Setting the background color to black will allow the default light content (white text/icons) to show on it. The statusbar plugin is included
+   in the config.xml file and will be added by the CLI when you build locally.
+
+   See https://github.com/apache/cordova-plugin-statusbar
+*/
+
+.statusbar-overlay {
+    background: #000000;
+}
+
+
+    .panel-left{
+            background: #200122;  
+            background: linear-gradient(to right, #6f0000, #200122); 
+            border-right:1px solid white;
+    }
+    .hr-2{
+    margin-bottom: 30px;
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), white, rgba(0, 0, 0, 0));
+    }
+    .text-1{
+    text-align: center;
+    text-shadow: 5px 5px 5px #000;    
+    color: #FFFFFF ;    
+    } 
+    .text-2{
+    text-align: left;
+    text-shadow: 3px 3px 3px #000;    
+    color: #FFFFFF ;    
+    }
+    ul{
+        list-style:none;
+    }
+
+    #fomo-logo{
+    	transform:translateX(90px);
+    	width:150px;
+    	height:100px;
+    }
+
+.content-block button{
+	width:100%;
+	background:none;
+	border:none;
+}
+
+.my-nav{
+	background: #200122;  
+    background: linear-gradient(to right, #6f0000, #200122); 
+}
+
+.page{
+	background: #232526 ;  
+	background: linear-gradient(to right, #414345, #232526); 
+}
+

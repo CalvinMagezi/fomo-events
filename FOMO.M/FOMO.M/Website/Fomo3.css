@@ -1,0 +1,275 @@
+* {
+    box-sizing: border-box;
+}
+
+body{
+	font-family: Allerta Stencil;
+	margin: 0;
+	background: black;
+}
+
+header{
+	text-align: center;
+	padding-left: 20px;
+	background: black;
+}
+
+
+h1{
+	color: #0EEE00;
+	text-transform: capitalize;
+	letter-spacing: 20px;
+	margin: 0 auto;
+	background: black;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 100px;
+	padding-right: 100px;
+	text-shadow: 0px 4px 3px yellow,
+				 0px 8px 13px green,
+				 0px 18px 23px black;
+}
+
+h2{
+	color: #00D102;
+	margin: 0 auto;
+	text-align: center;
+}
+
+a{
+	border: none;
+	height: 100%;
+	font-weight: 50;
+	font-size: 12px;
+	letter-spacing: 1px;
+	outline: none;
+	padding-right: 30px;
+	text-decoration: none;
+	color: white;
+}
+
+ul{
+	list-style: none;
+	margin: 0;
+	width: 100%;
+}
+
+div{
+	color: white;
+}
+
+/*========================
+	Nav Bars & Main Content
+/*=======================*/
+
+.firstBar{
+	background: #031C22;
+	border: none;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: 100%;
+	display: inline-block;
+	text-align: center;
+	margin: 0;
+}
+
+.firstBar a:hover {
+    color: #0EEE00;
+    border-radius: 25px;
+}
+
+.locationMenu{
+	background: #042932;
+	border: none;
+	height: 100%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: 100%;
+	text-align: center;
+}
+
+.locationMenu a:hover {
+    color: #0EEE00;
+    border-radius: 25px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 4px;
+  background: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #004e92, #000428); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Create four equal columns that sits next to each other */
+.column {
+  flex: 25%;
+  max-width: 25%;
+  padding: 0 4px;
+}
+
+
+/*===============================
+	Overlay (FOMO)
+/*===============================
+
+/* The Overlay (background) */
+.overlay {
+    /* Height & width depends on how you want to reveal the overlay (see JS below) */    
+    height: 100%;
+    width: 0;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    background-color: rgb(0,0,0); /* Black fallback color */
+    background-color: rgba(0,0,0, 0.9); /* Black w/opacity */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+/* Position the content inside the overlay */
+.overlay-content {
+    position: relative;
+    top: 25%; /* 25% from the top */
+    width: 100%; /* 100% width */
+    text-align: center; /* Centered text/links */
+    margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+}
+
+/* The navigation links inside the overlay */
+.overlay a {
+    padding: 8px;
+    text-decoration: none;
+    font-size: 36px;
+    color: #818181;
+    display: block; /* Display block instead of inline */
+    transition: 0.3s; /* Transition effects on hover (color) */
+}
+
+/* When you mouse over the navigation links, change their color */
+.overlay a:hover, .overlay a:focus {
+    color: #f1f1f1;
+}
+
+/* Position the close button (top right corner) */
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+    .overlay a {font-size: 20px}
+    .overlay .closebtn {
+        font-size: 40px;
+        top: 15px;
+        right: 35px;
+    }
+}
+/*=======================
+	Slide Show
+/*=======================
+
+/* Slideshow container */
+.slideshow-container {
+  max-width: 80%;
+  position: relative;
+  margin: auto;
+}
+
+/* Hide the images by default */
+.mySlides {
+    display: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* Caption text */
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 2.5s;
+  animation-name: fade;
+  animation-duration: 2.5s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+/* =============================== */
+/* Accessory Scripts */
+/* =============================== */
+
+.sidePics{
+	width: 100%;
+	border-radius: 50%
+}
+
+.bodyPics{
+	width: 100%;
+	border-radius: 25%;
+}
+
+.footer {
+	background: black;
+    text-align: center;
+    padding: 10px;
+}
+
+#login{
+	float: left;
+}
+
+#download{
+	float: right;
+}

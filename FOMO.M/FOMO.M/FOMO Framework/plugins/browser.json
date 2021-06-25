@@ -1,0 +1,21 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "network.fomo"
+        },
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "network.fomo"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "network.fomo"
+        }
+    },
+    "dependent_plugins": {}
+}
